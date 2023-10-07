@@ -1,0 +1,20 @@
+{% extends "layout.html" %}
+{% block content %}
+  <div class="addjob">
+    <form action="{{url_for('addjob')}}" method="POST">
+        <p>Job:</p>
+        <input type="text" name="job"><br>
+        
+        <p>Description:</p>
+        <input type="text" name="description"><br>
+
+        <p>Post Date:</p>
+        <input type="text" name="postdate"><br>
+        
+        <p>Due Date:</p>
+        <input type="text" name="enddate"><br><br>
+        
+        <input type="submit" value="Add Job">  
+    </form>
+  </div>
+{% endblock %}
