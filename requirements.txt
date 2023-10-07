@@ -1,0 +1,8 @@
+flask
+flask-security
+flask-wtf==1.01
+flask_sqlalchemy
+email-validator
+pytz
+bcrypt
+Flask-Session
