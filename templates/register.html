@@ -1,0 +1,14 @@
+{% extends "layout.html" %}
+{% block content %}
+  <div class="register">
+    <form action="{{url_for('adduser')}}" method="POST">
+        <p>Email:</p>
+        <input type="text" name="email"><br>
+        
+        <p>Password:</p>
+        <input type="password" name="password"><br><br>
+        
+        <input type="submit" value="Register">  
+    </form>
+  </div>
+{% endblock %}
