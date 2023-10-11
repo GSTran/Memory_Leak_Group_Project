@@ -1,0 +1,3 @@
+/Users/baburjalal/Desktop/data_parsing/cmake-build-debug/CMakeFiles/data_parsing.dir
+/Users/baburjalal/Desktop/data_parsing/cmake-build-debug/CMakeFiles/edit_cache.dir
+/Users/baburjalal/Desktop/data_parsing/cmake-build-debug/CMakeFiles/rebuild_cache.dir
