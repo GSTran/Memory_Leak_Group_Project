@@ -5,6 +5,12 @@ import sqlite3 as sql
 import mariadb
 import bcrypt
 import uuid
+from datetime import datetime
+
+def get_current_date():
+    current_date = datetime.now()
+    formatted_date = current_date.strftime("%Y-%m-%d")
+    return formatted_date
 
 app = Flask(__name__)
 app.secret_key = 'my_secret_key'    #for flask session
@@ -57,6 +63,12 @@ def logging():
         #Authenticate the user by comparing the encoded (hashed) password to the stored hash in the database
         if bcrypt.checkpw(password.encode('utf-8'), stored_password.encode('utf-8')):       #bcrypt.checkpw() automatically extracts the salt from the stored password and uses it to hash the password for comparison, wasting 6 hours of my time as I angrily and futilely try to extract the salt manually                                             
             session['email'] = email                                        #session key
+            cur.execute(f"SELECT role FROM users WHERE email='{email}'")
+            user_role = cur.fetchone()[0]
+            if user_role:
+                session['role'] = user_role
+            else:
+                session['role'] = 'USER'
             msg = "Welcome"
             return render_template("result.html", msg=msg)
         else:
@@ -146,26 +158,129 @@ def addjob():
     if 'email' not in session:
         return redirect(url_for('login'))
 
-    con = None
+    #con = None
 
     if request.method == 'POST':
         
-        job = request.form['job']
+        job_name = request.form['job']
         description = request.form['description']
         postdate = request.form['postdate']
         enddate = request.form['enddate']
 
         con = dbconnect()
         cur = con.cursor()
-        cur.execute("INSERT INTO jobs (job, description, postdate, enddate) VALUES (?, ?, ?, ?)", (job, description, postdate, enddate))
+        cur.execute("INSERT INTO jobs (job_name, description, postdate, enddate) VALUES (?, ?, ?, ?)", (job_name, description, postdate, enddate))
         con.commit()
         msg = "Job successfully added"
         
         con.close()
         return render_template("result.html", msg=msg)
 
+##############################################################
+#                 APPLICATION FUNCTIONS                      #
+##############################################################
+# -User can apply for jobs.                                  #
+# -User clicks link to apply and types of application msg.   #
+# -Manager can see applicants by clicking on link.           #
+# -Manager can manage application (reject/accept)            #
+# -User can view their application status                    #
+##############################################################
 
+@app.route('/apply/<job_name>/form', methods=['GET'])
+def application_form(job_name):
+    return render_template('apply.html', job_name=job_name)
 
-####################################
+@app.route('/apply/<job_name>/submit', methods=['POST'])
+def apply(job_name):
+    if 'email' not in session:
+        return redirect(url_for('login'))
+    current_date = get_current_date()
+    email=session['email']
+    con=dbconnect()
+    cur=con.cursor()
+    cur.execute(f"SELECT user_id FROM users WHERE email='{email}'")
+    user_id = cur.fetchone()[0]
+    cur.execute(f"SELECT job_id FROM jobs WHERE job_name='{job_name}'")
+    job_id = cur.fetchone()[0]
+    # Entering form info
+    if request.method == 'POST':
+        message = request.form['message']
+    cur.execute("INSERT INTO applications (job_id, user_id, application_date, message) VALUES (?, ?, ?, ?)", (job_id, user_id, current_date, message))
+    con.commit()
+    con.close()
+    msg = "Application sent!"
+    return render_template("result.html", msg=msg)
+
+@app.route('/view_applications/<job_name>')
+def check_applications(job_name):
+    if 'email' not in session:              #check session
+        return redirect(url_for('login'))
+    con=dbconnect()
+    cur=con.cursor()
+    cur.execute(f"SELECT job_id FROM jobs WHERE job_name='{job_name}'")
+    job_id = cur.fetchone()[0]
+    
+    cur.execute("""
+                SELECT a.application_date, a.message, a.status, u.email, a.user_id, a.job_id
+                FROM applications a
+                JOIN users u on a.user_id = u.user_id
+                WHERE a.job_id = ?
+                """, (job_id,))
+
+    rows = cur.fetchall()
+    con.close()
+    return render_template("applications.html", rows=rows, job_name=job_name)
+
+@app.route('/view_applicant/<user_id>/<job_id>')
+def view_applicant(job_id, user_id):
+    if 'email' not in session:              #check session
+        return redirect(url_for('login'))
+    con=dbconnect()
+    cur=con.cursor()
+    cur.execute("SELECT message FROM applications WHERE job_id = ? AND user_id = ?", (job_id, user_id))
+    message = cur.fetchone()[0]
+    cur.execute("SELECT application_date FROM applications WHERE job_id = ? AND user_id = ?", (job_id, user_id))
+    application_date = cur.fetchone()[0]
+    
+
+    cur.execute("SELECT job_name FROM jobs WHERE job_id = ?", (job_id,))
+    job_name = cur.fetchone()[0]
+    cur.execute("SELECT email FROM users WHERE user_id = ?", (user_id,))
+    user_email = cur.fetchone()[0]
+    con.close()
+    return render_template("applicant.html", message=message, application_date=application_date, job_name=job_name, user_email=user_email, job_id=job_id, user_id=user_id)
+
+@app.route('/process_application/<job_id>/<user_id>', methods=['POST'])
+def process_application(job_id, user_id):
+    if 'email' not in session:              #check session
+        return redirect(url_for('login'))
+    con=dbconnect()
+    cur=con.cursor()
+    decision = request.form['decision'] + "ed"
+    cur.execute("UPDATE applications SET status = ? WHERE job_id = ? AND user_id = ?", (decision, job_id, user_id))
+    con.commit()
+    con.close()
+    msg = decision
+    return render_template("result.html", msg=msg)
+
+@app.route('/view_user_app/')
+def view_user_app():
+    if 'email' not in session:              #check session
+        return redirect(url_for('login'))
+    email=session['email']
+    con=dbconnect()
+    cur=con.cursor()
+    cur.execute("SELECT user_id FROM users WHERE email = ?", (email,))
+    user_id = cur.fetchone()[0]
+    cur.execute(""" 
+                SELECT j.job_name, a.status
+                FROM applications a
+                JOIN jobs j on a.job_id = j.job_id
+                WHERE a.user_id = ?
+                """, (user_id,))
+    rows = cur.fetchall()
+    con.close()
+    return render_template("userappstatus.html", rows=rows)
+    
 if __name__ == "__main__":
     app.run(host="127.0.0.1", port=8080, debug=True)
