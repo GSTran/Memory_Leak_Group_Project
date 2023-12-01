@@ -2,12 +2,22 @@ from flask import Flask
 from flask import render_template, redirect, url_for, request, session
 import sqlite3
 import sqlite3 as sql
+import mariadb
 import bcrypt
 import uuid
 
 app = Flask(__name__)
 app.secret_key = 'my_secret_key'    #for flask session
 
+def dbconnect():
+    mariadb_connection = mariadb.connect(
+        user= "root",
+        password= "PASSWORD123",
+        host= "127.0.0.1",
+        port= 3306,
+        database= "db2"
+    )
+    return mariadb_connection
 
 #############
 #BASIC PAGES#
@@ -31,38 +41,28 @@ def login():
 @app.route('/logging/', methods=['POST', 'GET'])
 def logging():
     if request.method=='POST':                                                      #if form is submitted
-        try:
-            email=request.form['email']                                             #take the email and password entered and assign it to variables to check
-            password=request.form['password']
+        email=request.form['email']                                             #take the email and password entered and assign it to variables to check
+        password=request.form['password']
             
-            with sql.connect("database.db") as con:                                 #establish the connection
-                cur = con.cursor()                                                  #prepare for query
-
-                cur.execute(f"SELECT password FROM users WHERE email='{email}'")    #grabs the password with the condition that the entered email matches an email in the database
+        con = dbconnect()                              #establish the connection
+        cur = con.cursor()                                                  #prepare for query
+        cur.execute(f"SELECT password FROM users WHERE email='{email}'")    #grabs the password with the condition that the entered email matches an email in the database
                 
-                result = cur.fetchone()                                             #fetch the first row, which in this case just fetches the row that was selected
-                if not result:                                                      #if it's empty, which it will be if it couldn't fetch anything...
-                    msg = "Login Failed, your email is incorrect!"
-                    return render_template("result.html", msg=msg)
-                stored_password = result[0]                                         #go fetch the hashed password from the row
-                
-                #Authenticate the user by comparing the encoded (hashed) password to the stored hash in the database
-                if bcrypt.checkpw(password.encode('utf-8'), stored_password):       #bcrypt.checkpw() automatically extracts the salt from the stored password and uses it to hash the password for comparison, wasting 6 hours of my time as I angrily and futilely try to extract the salt manually                                             
-                    session['email'] = email                                        #session key
-                    msg = "Welcome"
-                    return render_template("result.html", msg=msg)
-                else:
-                    msg = "Login Failed, your password is incorrect!"
-                    return render_template("result.html", msg=msg)
-                
-        except Exception as e:                                                      #debugging
-            con.rollback()
-            print('error:', str(e))
-            msg = "error"
-
-        finally:                                                                    #this really only runs when there is an error because when the password/email match it just returns the template
-            con.close()
+        result = cur.fetchone()                                             #fetch the first row, which in this case just fetches the row that was selected
+        if not result:                                                      #if it's empty, which it will be if it couldn't fetch anything...
+            msg = "Login Failed, your email is incorrect!"
             return render_template("result.html", msg=msg)
+        stored_password = result[0]                                         #go fetch the hashed password from the row
+                
+        #Authenticate the user by comparing the encoded (hashed) password to the stored hash in the database
+        if bcrypt.checkpw(password.encode('utf-8'), stored_password.encode('utf-8')):       #bcrypt.checkpw() automatically extracts the salt from the stored password and uses it to hash the password for comparison, wasting 6 hours of my time as I angrily and futilely try to extract the salt manually                                             
+            session['email'] = email                                        #session key
+            msg = "Welcome"
+            return render_template("result.html", msg=msg)
+        else:
+            msg = "Login Failed, your password is incorrect!"
+            return render_template("result.html", msg=msg)
+                
 
 ###################
 #SELF PROVISIONING# 
@@ -75,30 +75,24 @@ def register():
 def adduser():
     
     if request.method == 'POST':
-        try:
-            email = request.form['email']                                           #takes the email and password from the form
-            password = request.form['password']
+        
+        email = request.form['email']                                           #takes the email and password from the form
+        password = request.form['password']
 
-            #hashing
-            bytes = password.encode('utf-8')                    #turn the plaintext password into a bytes format so I can use it with hashpw
-            salt = bcrypt.gensalt()                             #generate a salt
-            password=bcrypt.hashpw(bytes, salt)                 #hash it with bytes and salt
-            ########
+        #hashing
+        bytes = password.encode('utf-8')                    #turn the plaintext password into a bytes format so I can use it with hashpw
+        salt = bcrypt.gensalt()                             #generate a salt
+        password=bcrypt.hashpw(bytes, salt)                 #hash it with bytes and salt
+        ########
             
-            with sql.connect("database.db") as con:
-                cur = con.cursor()
-                cur.execute ("INSERT INTO users (email, password, salt) VALUES (?, ?, ?)", (email, password, salt))         #insert the email, hashed password, and salt into the database
-                con.commit()
-                msg = "User successfully added"
+        con = dbconnect()
+        cur = con.cursor()
+        cur.execute ("INSERT INTO users (email, password, salt) VALUES (?, ?, ?)", (email, password, salt))         #insert the email, hashed password, and salt into the database
+        con.commit()
+        msg = "User successfully added"
             
-        except Exception as e:          #debugging
-            con.rollback()
-            print('error:', str(e))
-            msg = "error"  
-
-        finally:
-            con.close()
-            return render_template("result.html", msg=msg)
+        con.close()
+        return render_template("result.html", msg=msg)
 
 ########
 #LOGOUT#
@@ -125,8 +119,8 @@ def logout():
 def jobportal():
     if 'email' not in session:              #check session
         return redirect(url_for('login'))
-    con=sql.connect("database.db")          
-    con.row_factory = sql.Row
+    con=dbconnect()         
+    #con.row_factory = sql.Row
     cur = con.cursor()
     cur.execute("select * from jobs")      
     rows = cur.fetchall()
@@ -137,7 +131,7 @@ def preaddjob():
     if 'email' not in session:
         return redirect(url_for('login'))
     email=session['email']
-    con=sql.connect("database.db")
+    con=dbconnect()
     cur = con.cursor()
     cur.execute(f"SELECT role FROM users WHERE email='{email}'")
     user_role = cur.fetchone()[0]
@@ -155,26 +149,20 @@ def addjob():
     con = None
 
     if request.method == 'POST':
-        try:
-            job = request.form['job']
-            description = request.form['description']
-            postdate = request.form['postdate']
-            enddate = request.form['enddate']
-
-            with sql.connect("database.db") as con:
-                cur = con.cursor()
-                cur.execute("INSERT INTO jobs (job, description, postdate, enddate) VALUES (?, ?, ?, ?)", (job, description, postdate, enddate))
-                con.commit()
-                msg = "Job successfully added"
         
-        except Exception as e:          #debugging
-            con.rollback()
-            print('error:', str(e))
-            msg = "error"  
+        job = request.form['job']
+        description = request.form['description']
+        postdate = request.form['postdate']
+        enddate = request.form['enddate']
 
-        finally:
-            con.close()
-            return render_template("result.html", msg=msg)
+        con = dbconnect()
+        cur = con.cursor()
+        cur.execute("INSERT INTO jobs (job, description, postdate, enddate) VALUES (?, ?, ?, ?)", (job, description, postdate, enddate))
+        con.commit()
+        msg = "Job successfully added"
+        
+        con.close()
+        return render_template("result.html", msg=msg)
 
 
 
