@@ -1,0 +1,22 @@
+<!doctype html>
+<html>
+   <body>
+      <h1>Application Details</h1>
+      
+      <h2>Job: {{ job_name }}</h2>
+      <h3>Applicant's Email: {{ user_email }}</h3>
+      <p>Application Date: {{ application_date }}</p>
+      <p>Message: {{ message }}</p>
+      
+      <form action="/process_application/{{ job_id }}/{{ user_id }}" method="POST">
+         <label for="decision">Select Action:</label>
+         <select id="decision" name="decision">
+            <option value="accept">Accept</option>
+            <option value="reject">Reject</option>
+         </select>
+         <input type="submit" value="Submit">
+      </form>
+      
+      <h2><a href="/">Go back to home page</a></h2>
+   </body>
+</html>
