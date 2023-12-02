@@ -1,7 +1,6 @@
 from flask import Flask
 from flask import render_template, redirect, url_for, request, session
-import sqlite3
-import sqlite3 as sql
+
 import mariadb
 import bcrypt
 import uuid
@@ -52,7 +51,7 @@ def logging():
             
         con = dbconnect()                              #establish the connection
         cur = con.cursor()                                                  #prepare for query
-        cur.execute(f"SELECT password FROM users WHERE email='{email}'")    #grabs the password with the condition that the entered email matches an email in the database
+        cur.execute(f"SELECT password FROM users WHERE email= ?", (email,))    #grabs the password with the condition that the entered email matches an email in the database
                 
         result = cur.fetchone()                                             #fetch the first row, which in this case just fetches the row that was selected
         if not result:                                                      #if it's empty, which it will be if it couldn't fetch anything...
@@ -63,7 +62,7 @@ def logging():
         #Authenticate the user by comparing the encoded (hashed) password to the stored hash in the database
         if bcrypt.checkpw(password.encode('utf-8'), stored_password.encode('utf-8')):       #bcrypt.checkpw() automatically extracts the salt from the stored password and uses it to hash the password for comparison, wasting 6 hours of my time as I angrily and futilely try to extract the salt manually                                             
             session['email'] = email                                        #session key
-            cur.execute(f"SELECT role FROM users WHERE email='{email}'")
+            cur.execute(f"SELECT role FROM users WHERE email= ?", (email,))
             user_role = cur.fetchone()[0]
             if user_role:
                 session['role'] = user_role
@@ -145,7 +144,7 @@ def preaddjob():
     email=session['email']
     con=dbconnect()
     cur = con.cursor()
-    cur.execute(f"SELECT role FROM users WHERE email='{email}'")
+    cur.execute(f"SELECT role FROM users WHERE email= ?", (email,))
     user_role = cur.fetchone()[0]
     if(user_role!='MANAGER'):
         msg = "You're not a manager"
@@ -198,9 +197,9 @@ def apply(job_name):
     email=session['email']
     con=dbconnect()
     cur=con.cursor()
-    cur.execute(f"SELECT user_id FROM users WHERE email='{email}'")
+    cur.execute(f"SELECT user_id FROM users WHERE email= ?", (email,))
     user_id = cur.fetchone()[0]
-    cur.execute(f"SELECT job_id FROM jobs WHERE job_name='{job_name}'")
+    cur.execute(f"SELECT job_id FROM jobs WHERE job_name= ?", (job_name,))
     job_id = cur.fetchone()[0]
     # Entering form info
     if request.method == 'POST':
@@ -217,7 +216,7 @@ def check_applications(job_name):
         return redirect(url_for('login'))
     con=dbconnect()
     cur=con.cursor()
-    cur.execute(f"SELECT job_id FROM jobs WHERE job_name='{job_name}'")
+    cur.execute(f"SELECT job_id FROM jobs WHERE job_name= ?", (job_name,))
     job_id = cur.fetchone()[0]
     
     cur.execute("""

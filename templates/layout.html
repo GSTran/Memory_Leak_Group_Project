@@ -1,26 +1,75 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <title>Flask app</title>
-        <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
-    </head>
-  <body>
-    <header>
-      <div class="container">
-        <h1 class="logo">City of Williamston</h1>
-        <strong><nav>
-          <ul class="menu">
-            <li><a href="{{ url_for('home') }}">City of Williamston</a></li>
-            <li><a href="{{ url_for('jobportal') }}">City of Williamston Job Portal</a></li>
-            <li><a href="{{ url_for('login') }}">Login</a></li>
-            <li><a href="{{ url_for('logout') }}">Logout</a></li>
-          </ul>
-        </nav></strong>
-      </div>
-    </header>
+
+<head>
+  <title>Flask app</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+</head>
+
+<head>
+  <style>
+    .centerDiv {
+      text-align: center;
+    }
+
+    .welcomeHeader {
+      font-size: 4vw;
+      font-family: Arial;
+      color: white;
+      text-align: center;
+    }
+
+    .topHeaderBox {
+      border: 3px solid #000;
+      background: rgb(106, 6, 6);
+    }
+
+    .layoutButtons {
+      margin-top: 1vw;
+      height: 2vw;
+      border-radius: 20px;
+      padding-left: 1vw;
+      padding-right: 1vw;
+      font-family: Arial;
+      font-size: 1vw;
+      background: rgba(106, 6, 6);
+      color: white;
+    }
+
+
+  a:link, a:visited {
+    text-decoration: none;
+  }
+  </style>
+</head>
+
+<body>
+  <header>
     <div class="container">
-      {% block content %}
-      {% endblock %}
+      <div class="topHeaderBox">
+        <h1 class="welcomeHeader">City of Williamston</h1>
+      </div>
+      <strong>
+        <nav>
+            <ul class="menu">
+              <a class="layoutButtons" href="{{ url_for('home') }}">City of Williamston</a>
+              
+              {% if 'email' not in session %}
+              <a class="layoutButtons" href="{{ url_for('login') }}">Login</a>
+              {% endif %}
+              {% if 'email' in session %}
+              <a class="layoutButtons" href="{{ url_for('logout') }}">Logout</a>
+              <a class="layoutButtons" href="{{ url_for('jobportal') }}">City of Williamston Job Portal</a>
+              {% endif %}
+            </ul>
+        </nav>
+      </strong>
     </div>
-  </body>
+  </header>
+  <div class="container">
+    {% block content %}
+    {% endblock %}
+  </div>
+</body>
+
 </html>

@@ -1,34 +1,101 @@
-<!DOCTYPE html>
+{% extends "layout.html" %}
+{% block content %}
 <html>
+
 <head>
-    <title>Applications for {{ job_name }}</title>
+    <style>
+        .centerDiv {
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        .tableLabel {
+            text-align: center;
+            font-family: Arial;
+            border-radius: 5px;
+            font-size: 1vw;
+            background-color: white;
+            border: 2px solid #000;
+            font-weight: bold;
+        }
+
+        .jobHeader {
+            font-size: 4vw;
+            font-family: Arial;
+            color: black;
+            font-weight: bold;
+        }
+
+        .topHeaderBox {
+            border: 3px solid #000;
+            background: rgb(106, 6, 6);
+        }
+
+        .jobTable {
+            width: 90vw;
+            height: 5vw;
+            flex-shrink: 0;
+            border-radius: 5px;
+            border: 3px solid #000;
+            background: rgba(106, 6, 6, 0.323);
+            box-shadow: 4px 4px 4px 0px rgba(0, 0, 0, 0.25);
+            backdrop-filter: blur(15px);
+        }
+
+        .jobAttributes {
+            font-family: Arial;
+            border-radius: 5px;
+            font-size: 0.8vw;
+            background-color: white;
+            border: 2px solid #000;
+        }
+
+        .jobTableButtons {
+            margin-top: 1vw;
+            height: 2vw;
+            border-radius: 20px;
+            font-family: Arial;
+            font-size: 1vw;
+            padding-left: 0.8vw;
+            padding-right: 0.8vw;
+            background: rgba(106, 6, 6, 0.323);
+            color: white;
+        }
+    </style>
 </head>
+
+<head>
+    <title class="jobHeader">Applications for {{ job_name }}</title>
+</head>
+
 <body>
     <h1>Applications for {{ job_name }}</h1>
-    <table border="1">
+    <table class="jobTable" border="1">
         <thead>
             <tr>
-                <th>Email</th>
-                <th>Date Posted</th>
-                <th>Status</th>
-                <th>Action</th>
+                <th class="tableLabel">Email</th>
+                <th class="tableLabel">Date Posted</th>
+                <th class="tableLabel">Status</th>
+                <th class="tableLabel">Action</th>
             </tr>
         </thead>
         <tbody>
             {% for row in rows %}
-                <tr>
-                    <td>{{ row[3] }}</td>
-                    <td>{{ row[0] }}</td>
-                    <td>{{ row[2] }}</td>
-                    <td>
-                        <form method="GET" action="/view_applicant/{{ row[4] }}/{{ row[5] }}">
-                            <input type="submit" value="View Applicant">
-                        </form>
-                    </td>
-                </tr>
+            <tr>
+                <td class="jobAttributes">{{ row[3] }}</td>
+                <td class="jobAttributes">{{ row[0] }}</td>
+                <td class="jobAttributes">{{ row[2] }}</td>
+                <td class="jobAttributes">
+                    <form class="" method="GET" action="/view_applicant/{{ row[4] }}/{{ row[5] }}">
+                        <input type="submit" value="View Applicant">
+                    </form>
+                </td>
+            </tr>
             {% endfor %}
         </tbody>
     </table>
-    <a href="/">Go back to home page</a>
 </body>
+
 </html>
+{% endblock %}

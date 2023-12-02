@@ -1,24 +1,95 @@
-<!doctype html>
+
+{% extends "layout.html" %}
+{% block content %}
+
 <html>
+<head>
+   <style>
+      .centerDiv {
+         justify-content: center;
+         align-items: center;
+      }
+
+      .tableLabel {
+         text-align: center;
+         font-family: Arial;
+         border-radius: 5px;
+         font-size: 1vw;
+         background-color: white;
+         border: 2px solid #000;
+         font-weight: bold;
+      }
+
+      .jobHeader {
+         font-size: 4vw;
+         font-family: Arial;
+         color: black;
+      }
+
+      .topHeaderBox {
+         border: 3px solid #000;
+         background: rgb(106, 6, 6);
+      }
+
+      .jobTable {
+         width: 90vw;
+         height: 5vw;
+         flex-shrink: 0;
+         border-radius: 5px;
+         border: 3px solid #000;
+         background: rgba(106, 6, 6, 0.323);
+         box-shadow: 4px 4px 4px 0px rgba(0, 0, 0, 0.25);
+         backdrop-filter: blur(15px);
+      }
+
+      .jobAttributes {
+         font-family: Arial;
+         border-radius: 5px;
+         font-size: 0.8vw;
+         background-color: white;
+         border: 2px solid #000;
+      }
+
+      .jobTableButtons {
+         margin-top: 1vw;
+         margin-top: 1vw;
+         height: 2vw;
+         border-radius: 20px;
+         padding-left: 1vw;
+         padding-right: 1vw;
+         font-family: Arial;
+         font-size: 1vw;
+         background: rgba(106, 6, 6);
+         color: white;
+      }
+   </style>
+</head>
+
    <body>
-      <table border="1">
-         <thead>
-            <tr>
-               <td>Job</td>
-               <td>Description</td>
-               <td>Date Posted</td>
-               <td>Applications Close</td>
-               <td>Actions</td>
-            </tr>
-         </thead>
+      <div class="centerDiv">
+         {% if 'role' in session and session['role'] == 'MANAGER' %}
+         <a class = "jobTableButtons" href="/preaddjob/">Add Job</a>
+         {% endif %} 
+
+         {% if 'role' in session and session['role'] != 'MANAGER' %}
+         <a class = "jobTableButtons" href="/view_user_app/">View your application</a>
+         {% endif %}
+         <table class="jobTable" border=1>
+            <thead>
+               <td class="tableLabel">Job</td>
+               <td class="tableLabel">Description</td>
+               <td class="tableLabel">Date Posted</td>
+               <td class="tableLabel">Applications Close</td>
+               <td class="tableLabel">Action</td>
+            </thead>
          <tbody>
             {% for row in rows %}
             <tr>
-               <td>{{ row[1] }}</td>
-               <td>{{ row[2] }}</td>
-               <td>{{ row[3] }}</td>
-               <td>{{ row[4] }}</td>
-               <td>
+               <td class="jobAttributes">{{row[1]}}</td>
+               <td class="jobAttributes">{{row[2]}}</td>
+               <td class="jobAttributes">{{row[3]}}</td>
+               <td class="jobAttributes">{{row[4]}}</td>
+               <td class="jobAttributes">
                   {% if 'role' in session and session['role'] != 'MANAGER' %}
                       <form method="GET" action="/apply/{{ row[1] }}/form">
                           <input type="submit" value="Apply Now">
@@ -35,13 +106,7 @@
             {% endfor %}
          </tbody>
       </table>
-      <a href="/">Go back to home page</a>
-      {% if 'role' in session and session['role'] == 'MANAGER' %}
-         <a href="/preaddjob/">Add Job</a>
-      {% endif %} 
-
-      {% if 'role' in session and session['role'] != 'MANAGER' %}
-         <a href="/view_user_app/">View your application</a>
-      {% endif %}
+      </div>
    </body>
 </html>
+{% endblock %}

@@ -1,20 +1,74 @@
 {% extends "layout.html" %}
 {% block content %}
-  <div class="addjob">
-    <form action="{{url_for('addjob')}}" method="POST">
-        <p>Job:</p>
-        <input type="text" name="job"><br>
-        
-        <p>Description:</p>
-        <input type="text" name="description"><br>
 
-        <p>Post Date:</p>
-        <input type="text" name="postdate"><br>
-        
-        <p>Due Date:</p>
-        <input type="text" name="enddate"><br><br>
-        
-        <input type="submit" value="Add Job">  
-    </form>
+<head>
+  <style>
+    .centerDiv {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .center {
+      text-align: center;
+    }
+
+    .glasspane {
+      flex-shrink: 0;
+      border-radius: 20px;
+      border: 3px solid #000;
+      background: rgba(106, 6, 6, 0.323);
+      box-shadow: 4px 4px 4px 0px rgba(0, 0, 0, 0.25);
+      backdrop-filter: blur(15px);
+      width: 30vw;
+      height: 35vw;
+      text-align: center;
+    }
+
+    .inputBox {
+      height: 2vw;
+      width: 20vw;
+      border-radius: 15px;
+      font-size: 1.5vw;
+      font-family: Arial;
+    }
+
+    .loginLabel {
+      font-size: 1.5vw;
+      font-family: Arial;
+      color: white;
+    }
+
+    .loginButton {
+      margin-top: 1vw;
+      height: 2vw;
+      width: 10vw;
+      border-radius: 20px;
+      font-family: Arial;
+      font-size: 1vw;
+      background-color: white;
+    }
+  </style>
+</head>
+<div class="centerDiv">
+  <div class="glasspane">
+    <div class="addjob">
+      <form action="{{url_for('addjob')}}" method="POST">
+        <p class="loginLabel">Job:</p>
+        <input class="inputBox" type="text" name="job"><br>
+
+        <p class="loginLabel">Description:</p>
+        <input class="inputBox" type="text" name="description"><br>
+
+        <p class="loginLabel">Post Date:</p>
+        <input class="inputBox" type="text" name="postdate"><br>
+
+        <p class="loginLabel">Due Date:</p>
+        <input class="inputBox" type="text" name="enddate"><br><br>
+
+        <input class="loginButton" type="submit" value="Add Job">
+      </form>
+    </div>
   </div>
+</div>
 {% endblock %}

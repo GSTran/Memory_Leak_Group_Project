@@ -1,5 +1,65 @@
-<form method="POST" action="/apply/{{ job_name }}/submit">
-    <label for="message">Your Message:</label><br>
-    <textarea id="message" name="message" rows="4" cols="50" placeholder="Enter your message here"></textarea><br>
-    <input type="submit" value="Submit Application">
-</form>
+<head>
+    <style>
+        .centerDiv {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .welcomeHeader {
+            font-size: 4vw;
+            font-family: Arial;
+            color: white;
+        }
+
+        .topHeaderBox {
+            border: 3px solid #000;
+            background: rgb(106, 6, 6);
+        }
+
+        .glasspane {
+            flex-shrink: 0;
+            border-radius: 20px;
+            border: 3px solid #000;
+            background: rgba(106, 6, 6, 0.323);
+            box-shadow: 4px 4px 4px 0px rgba(0, 0, 0, 0.25);
+            backdrop-filter: blur(15px);
+            width: 30vw;
+            height: 30vw;
+            text-align: center;
+        }
+
+        .inputStyle {
+            border-radius: 5px;
+            height: 23vw;
+            width: 25vw;
+        }
+
+        .buttonStyle {
+            margin-top: 1vw;
+            height: 2vw;
+            width: 10vw;
+            border-radius: 20px;
+            font-family: Arial;
+            font-size: 1vw;
+            background-color: white;
+        }
+
+        .titleStyle {
+            color: white;
+            font-family: Arial;
+            font-weight: bold;
+            font-size: 2vw;
+        }
+    </style>
+</head>
+<div class="centerDiv">
+    <div class="glasspane">
+        <form method="POST" action="/apply/{{ job_name }}/submit">
+            <label class="titleStyle" for="message">Apply</label><br>
+            <textarea class="inputStyle id=" message" name="message" rows="4" cols="50"
+                placeholder="Enter application details here"></textarea><br>
+            <input class="buttonStyle" type="submit" value="Submit Application">
+        </form>
+    </div>
+</div>

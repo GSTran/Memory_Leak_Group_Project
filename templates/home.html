@@ -1,6 +1,29 @@
 {% extends "layout.html" %}
 {% block content %}
-  <div class="home">
-    <h1>Welcome to the City of Williamston Directory!</h1><br>
+
+<head>
+  <style>
+    .centerDiv {
+      text-align: center;
+    }
+
+    .welcomeHeader {
+      font-size: 4vw;
+      font-family: Arial;
+      color: white;
+    }
+
+    .topHeaderBox {
+      border: 3px solid #000;
+      background: rgb(106, 6, 6);
+    }
+  </style>
+</head>
+<div class="home">
+  <div class="topHeaderBox">
+    <div class="centerDiv">
+      <h1 class="welcomeHeader">Welcome to the City of Williamston Directory!</h1><br>
+    </div>
   </div>
+</div>
 {% endblock %}

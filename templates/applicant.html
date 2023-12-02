@@ -1,22 +1,104 @@
-<!doctype html>
+{% extends "layout.html" %}
+{% block content %}
+
+<head>
+   <style>
+      .centerDiv {
+         display: flex;
+         justify-content: center;
+         align-items: center;
+      }
+
+      .welcomeHeader {
+         font-size: 4vw;
+         font-family: Arial;
+         color: white;
+      }
+
+      .topHeaderBox {
+         border: 3px solid #000;
+         background: rgb(106, 6, 6);
+      }
+
+      .glasspane {
+         flex-shrink: 0;
+         border-radius: 20px;
+         border: 3px solid #000;
+         background: rgba(106, 6, 6, 0.323);
+         box-shadow: 4px 4px 4px 0px rgba(0, 0, 0, 0.25);
+         backdrop-filter: blur(15px);
+         width: 30vw;
+         height: 30vw;
+         text-align: center;
+      }
+
+      .inputStyle {
+         border-radius: 5px;
+         height: 23vw;
+         width: 25vw;
+      }
+
+      .buttonStyle {
+         margin-top: 1vw;
+         height: 2vw;
+         padding-left: 1vw;
+         padding-right: 1vw;
+         border-radius: 20px;
+         font-family: Arial;
+         font-size: 1vw;
+         background-color: white;
+      }
+
+      .titleStyle {
+         color: white;
+         font-family: Arial;
+         font-weight: bold;
+         font-size: 2vw;
+      }
+
+      .applicationHeader {
+         font-size: 2vw;
+         font-family: Arial;
+         color: white;
+         font-weight: bold;
+         margin-top: 0.5vw;
+         margin-bottom: 0;
+      }
+
+      .infoStyle {
+         font-size: 1vw;
+         font-family: Arial;
+         color: black;
+         margin-top: 0.5vw;
+         margin-bottom: 0.5vw;
+      }
+   </style>
+</head>
 <html>
-   <body>
-      <h1>Application Details</h1>
-      
-      <h2>Job: {{ job_name }}</h2>
-      <h3>Applicant's Email: {{ user_email }}</h3>
-      <p>Application Date: {{ application_date }}</p>
-      <p>Message: {{ message }}</p>
-      
-      <form action="/process_application/{{ job_id }}/{{ user_id }}" method="POST">
-         <label for="decision">Select Action:</label>
-         <select id="decision" name="decision">
-            <option value="accept">Accept</option>
-            <option value="reject">Reject</option>
-         </select>
-         <input type="submit" value="Submit">
-      </form>
-      
-      <h2><a href="/">Go back to home page</a></h2>
-   </body>
+
+<body class="centerDiv">
+   <div>
+      <div class="glasspane">
+         <h1 class="applicationHeader">Application Details</h1>
+
+         <h2 class="infoStyle">Job: {{ job_name }}</h2>
+         <h3 class="infoStyle">Applicant's Email: {{ user_email }}</h3>
+         <p class="infoStyle">Application Date: {{ application_date }}</p>
+         <p class="infoStyle">Message: {{ message }}</p>
+
+         <form action="/process_application/{{ job_id }}/{{ user_id }}" method="POST">
+            <label for="decision">Select Action:</label>
+            <select id="decision" name="decision">
+               <option value="accept">Accept</option>
+               <option value="reject">Reject</option>
+            </select>
+            <input type="submit" value="Submit">
+         </form>
+
+      </div>
+   </div>
+
+</body>
+
 </html>
+{% endblock %}

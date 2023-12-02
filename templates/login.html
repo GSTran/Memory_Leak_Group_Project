@@ -1,15 +1,90 @@
 {% extends "layout.html" %}
 {% block content %}
-  <div class="login">
-    <form action="{{url_for('logging')}}" method="POST">
-        <p>Email:</p>
-        <input type="text" name="email"><br>
-        
-        <p>Password:</p>
-        <input type="password" name="password"><br><br>
-        
-        <input type="submit" value="Login">  
-    </form>
-    <p class="bottom">Don't have an account?  <a class="bottom" href="{{url_for('register')}}"> Sign up here</a></p>
+
+<head>
+  <style>
+    .centerDiv {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .center {
+      text-align: center;
+    }
+
+    .glasspane {
+      flex-shrink: 0;
+      border-radius: 20px;
+      border: 3px solid #000;
+      background: rgba(106, 6, 6, 0.323);
+      box-shadow: 4px 4px 4px 0px rgba(0, 0, 0, 0.25);
+      backdrop-filter: blur(15px);
+      width: 30vw;
+      height: 30vw;
+      text-align: center;
+    }
+
+    .welcomeHeader {
+      font-size: 4vw;
+      font-family: Arial;
+      color: white;
+    }
+
+    .topHeaderBox {
+      border: 3px solid #000;
+      background: rgb(106, 6, 6);
+    }
+
+    .inputBox {
+      height: 2vw;
+      width: 20vw;
+      border-radius: 15px;
+      font-size: 1.5vw;
+      font-family: Arial;
+    }
+
+    .loginLabel {
+      font-size: 1.5vw;
+      font-family: Arial;
+      color: white;
+    }
+
+    .loginButton {
+      margin-top: 1vw;
+      height: 2vw;
+      width: 10vw;
+      border-radius: 20px;
+      font-family: Arial;
+      font-size: 1vw;
+      background-color: white;
+    }
+
+    .signUpSentence {
+      margin-top: 4vw;
+      font-family: Arial;
+      font-size: 1vw;
+    }
+  </style>
+</head>
+<div class="login">
+  <div class="centerDiv">
+    <div class="glasspane">
+      <form action="{{url_for('logging')}}" method="POST">
+        <p class="loginLabel">Email:</p>
+        <input type="text" name="email" class="inputBox"><br>
+
+        <p class="loginLabel">Password:</p>
+        <input type="password" name="password" class="inputBox"><br><br>
+
+        <input type="submit" value="Login" class="loginButton">
+      </form>
+      <p class="signUpSentence">Don't have an account?
+        <a class="bottom" href="{{url_for('register')}}">
+          Sign up here
+        </a>
+      </p>
+    </div>
   </div>
+</div>
 {% endblock %}
